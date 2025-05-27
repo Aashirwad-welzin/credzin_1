@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import sampleImage from "../Images/pexels-ivan-samkov-7621136.jpg";
 import { apiEndpoint } from '../api';
+import { toast } from 'react-toastify';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ function Login() {
         throw new Error('Login failed');
       }
       if (response.status === 200 ){
-        console.log("Login successful");
+        toast.success("Login successful!");
         localStorage.setItem("token", response.data.token);
         console.log("response from login is", response.data);;
         if(response.data.user.isfirstLogin===true) {

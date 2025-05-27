@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { apiEndpoint } from '../api';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -41,8 +42,20 @@ const Signup = () => {
         contact: formData.contact,
       });
 
-      console.log('Signup successful:', response.data);
-      navigate('/login');
+      if(response.status === 200) {
+        toast.success('Signup successful! Please log in.',{
+          autoClose: 1000,
+          position: "top-center",
+        });
+        navigate('/login');
+      }
+      else {
+        toast.error('Signup failed. Please try again.',response.data.message, {
+          autoClose: 1000,
+          position: "top-center",
+        }); 
+      }
+      
     } catch (err) {
       setError('Signup failed. Please try again.');
       console.log(err.message);
