@@ -7,7 +7,6 @@ import { apiEndpoint } from "../api";
 import { setBankList } from "../app/slices/bankSlice";
 
 
-
 const ManageCards = () => {
   const [selectedBank, setSelectedBank] = useState("Select Bank");
   const [bankCards, setBankCards] = useState([]);
