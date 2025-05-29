@@ -29,9 +29,9 @@ exports.signup = async (req, res) => {
     user.token = token;
     await user.save();
 
-    res.status(201).json({ user, token });
+    res.status(200).json({ user, token });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message});
   }
 };
 
