@@ -128,31 +128,44 @@ for user in users_with_cards:
     # location = 'Mohali'
     # list_of_cards = ['Axis Bank Vistara Credit Card', 'Axis Bank Atlas Credit Card', 'Axis Bank Rewards Credit Card']
     #response = agent3.print_response("{name} is a {age} years old {profession} with a monthly salary of INR {income} working in {location}. He already have these credit cards {list_of_cards}. Recommend him another credit card.", stream=True, markdown=True)
-    prompt = f''' You are a seasoned credit-card product specialist for the Indian market.
-                **Customer profile**
-                • Name: {name}
-                • Age: {age} years
-                • Profession: {profession}
-                • Monthly income: ₹ {income}
-                • Location: {location}
-                **Existing cards:** {card_names}
-                **Task**
-                1. Analyse the customer's profile, spending potential and current card portfolio.
-                2. Identify gaps in rewards, benefits or categories not covered by the existing cards (e.g., travel, dining, fuel, subscriptions).
-                3. Recommend ONE suitable credit card issued in India that best complements the current set.
-                4. Justify your choice in ≤ 120 words, covering:
-                • Key benefits that fill the identified gaps
-                • Annual/joining fee and effective waiver options
-                • Why it outperforms alternatives for this customer
-                **Important rules**
-                1. Output **exactly one** card name—no lists, alternates, or "also consider" suggestions.
-                2. Do *not* mention or compare any card other than your single recommendation. 
-                3. Follow the output template verbatim.
-                **Output template** (Markdown)
-                **Best Card:** *<Card Name>*
-                **Why it suits {name}:** <justification>
-                **Suggest only 1 card and no extra text**
-            '''
+    prompt = f'''You are a seasoned credit-card product specialist for the Indian market.
+
+    **CRITICAL CONSTRAINT: You MUST only recommend cards that exist in your knowledge base. Do NOT suggest any cards not present in the provided data.**
+
+    **Customer profile**
+    • Name: {name}
+    • Age: {age} years
+    • Profession: {profession}
+    • Monthly income: ₹ {income}
+    • Location: {location}
+
+    **Existing cards:** {card_names}
+
+    **Task**
+    1. FIRST, search your knowledge base to identify ALL available credit cards.
+    2. EXCLUDE any cards the customer already owns from your consideration.
+    3. Analyse the customer's profile, spending potential and current card portfolio.
+    4. Identify gaps in rewards, benefits or categories not covered by the existing cards (e.g., travel, dining, fuel, subscriptions).
+    5. From the REMAINING cards in your knowledge base ONLY, recommend ONE suitable credit card that best complements the current set.
+    6. Justify your choice in ≤ 120 words, covering:
+    • Key benefits that fill the identified gaps
+    • Annual/joining fee and effective waiver options
+    • Why it outperforms alternatives for this customer
+
+    **MANDATORY RULES**
+    1. Output **exactly one** card name—no lists, alternates, or "also consider" suggestions.
+    2. The recommended card MUST exist in your knowledge base - verify this before responding.
+    3. Do NOT recommend cards the customer already owns.
+    4. Do NOT mention or compare any card other than your single recommendation.
+    5. If no suitable card exists in your knowledge base, respond with "No suitable card found in available options."
+    6. Follow the output template verbatim.
+
+    **Output template** (Markdown)
+    **Best Card:** *<Card Name>*
+    **Why it suits {name}:** <justification>
+
+    **Suggest only 1 card from your knowledge base and no extra text**
+    '''
     # response = agent3.print_response(
     #                                 prompt,
     #                                 stream=True,
