@@ -6,7 +6,10 @@
 - Decide the full schema of the app
 
 ## User Flow
-- login > salary details > add cards > show recommendations
+- login > personal/salary details > add cards > show recommendations
+- gmail consent required for spend analysis, start populating credit card data
+- reward maximizer [MVP], can show all the cards based on rank
+- 
 
 ## Login-Page
 Toast for an existing user if the emails is already found during signup
@@ -26,7 +29,6 @@ Toast for an existing user if the emails is already found during signup
 - Rename the page and routes to wallet
 - Add user messages as toast on button clicks
 - Add card images in the card list
-
 
 
 ## Credzin PyCode
@@ -65,7 +67,21 @@ A modular and extensible system for recommending credit cards based on user pref
 - Matches cards to specific categories
 - Provides personalized recommendations based on user's existing cards
 
-.
+
+- feature - recommendation
+- mvp - credit card bot/using MCP
+- gmail consent required for spend analysis, start populating credit card data
+- reward maximizer [MVP], can show all the cards based on rank
+- user engagement - via emails nudges, notifications
+- Content - Auto blogs, biweekly newsletter
+- feature - recommendation
+- pool of cards
+
+
+
+
+
+
 
 ## Architecture
 
@@ -188,4 +204,6 @@ Install nodejs in our system
 
 ## License
 MIT License 
+
+
 
