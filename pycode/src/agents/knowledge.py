@@ -1,3 +1,6 @@
+
+
+
 from agno.knowledge.csv import CSVKnowledgeBase
 from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
 from agno.knowledge.combined import CombinedKnowledgeBase
@@ -8,6 +11,8 @@ from agno.embedder.sentence_transformer import SentenceTransformerEmbedder
 import pymongo
 from agno.tools.thinking import ThinkingTools
 from agno.tools.reasoning import ReasoningTools
+import re
+from agno.run.response import RunResponse
 # Initialize the local embedder
 embedder = SentenceTransformerEmbedder(id="all-MiniLM-L6-v2")
 # Initialize ChromaDB with the local embedder
@@ -123,31 +128,44 @@ for user in users_with_cards:
     # location = 'Mohali'
     # list_of_cards = ['Axis Bank Vistara Credit Card', 'Axis Bank Atlas Credit Card', 'Axis Bank Rewards Credit Card']
     #response = agent3.print_response("{name} is a {age} years old {profession} with a monthly salary of INR {income} working in {location}. He already have these credit cards {list_of_cards}. Recommend him another credit card.", stream=True, markdown=True)
-    prompt = f''' You are a seasoned credit-card product specialist for the Indian market.
-                **Customer profile**
-                • Name: {name}
-                • Age: {age} years
-                • Profession: {profession}
-                • Monthly income: ₹ {income}
-                • Location: {location}
-                **Existing cards:** {card_names}
-                **Task**
-                1. Analyse the customer's profile, spending potential and current card portfolio.
-                2. Identify gaps in rewards, benefits or categories not covered by the existing cards (e.g., travel, dining, fuel, subscriptions).
-                3. Recommend ONE suitable credit card issued in India that best complements the current set.
-                4. Justify your choice in ≤ 120 words, covering:
-                • Key benefits that fill the identified gaps
-                • Annual/joining fee and effective waiver options
-                • Why it outperforms alternatives for this customer
-                **Important rules**
-                1. Output **exactly one** card name—no lists, alternates, or "also consider" suggestions.
-                2. Do *not* mention or compare any card other than your single recommendation. 
-                3. Follow the output template verbatim.
-                **Output template** (Markdown)
-                **Best Card:** *<Card Name>*
-                **Why it suits {name}:** <justification>
-                **Suggest only 1 card and no extra text**
-            '''
+    prompt = f'''You are a seasoned credit-card product specialist for the Indian market.
+
+    **CRITICAL CONSTRAINT: You MUST only recommend cards that exist in your knowledge base. Do NOT suggest any cards not present in the provided data.**
+
+    **Customer profile**
+    • Name: {name}
+    • Age: {age} years
+    • Profession: {profession}
+    • Monthly income: ₹ {income}
+    • Location: {location}
+
+    **Existing cards:** {card_names}
+
+    **Task**
+    1. FIRST, search your knowledge base to identify ALL available credit cards.
+    2. EXCLUDE any cards the customer already owns from your consideration.
+    3. Analyse the customer's profile, spending potential and current card portfolio.
+    4. Identify gaps in rewards, benefits or categories not covered by the existing cards (e.g., travel, dining, fuel, subscriptions).
+    5. From the REMAINING cards in your knowledge base ONLY, recommend ONE suitable credit card that best complements the current set.
+    6. Justify your choice in ≤ 120 words, covering:
+    • Key benefits that fill the identified gaps
+    • Annual/joining fee and effective waiver options
+    • Why it outperforms alternatives for this customer
+
+    **MANDATORY RULES**
+    1. Output **exactly one** card name—no lists, alternates, or "also consider" suggestions.
+    2. The recommended card MUST exist in your knowledge base - verify this before responding.
+    3. Do NOT recommend cards the customer already owns.
+    4. Do NOT mention or compare any card other than your single recommendation.
+    5. If no suitable card exists in your knowledge base, respond with "No suitable card found in available options."
+    6. Follow the output template verbatim.
+
+    **Output template** (Markdown)
+    **Best Card:** *<Card Name>*
+    **Why it suits {name}:** <justification>
+
+    **Suggest only 1 card from your knowledge base and no extra text**
+    '''
     # response = agent3.print_response(
     #                                 prompt,
     #                                 stream=True,
@@ -172,11 +190,67 @@ for user in users_with_cards:
     response = agent3.run('recommend only 1 credit card name', stream=False, markdown=True)
     print('Agent response:: ', response.content)
     print(type(response))
+
+    def extract_best_card(resp_obj) -> str:
+        """Return the card name or raise ValueError."""
+
+        # 1️⃣  Get raw text out
+        raw = (
+            resp_obj.to_string()            # many agno objects expose this
+            if hasattr(resp_obj, "to_string")
+            else str(resp_obj)
+        ).strip()
+
+        # 2️⃣  Strip the Markdown noise so we can run a very plain regex
+        clean = re.sub(r"[*_`]", "", raw)   # "**Best Card:**" → "Best Card:"
+
+        # 3️⃣  Find 'Best Card:' and capture the rest of that line
+        m = re.search(r"best\s*card\s*[:\-–]\s*([^\n\r]+)", clean, flags=re.I)
+        if not m:
+            raise ValueError("No 'Best Card' line found. Sample text:\n" + raw[:200])
+
+        return m.group(1).strip() 
+    
+
+    best_card_name = extract_best_card(response.content)
+    print("Extracted →", best_card_name)
+
+    def get_card_id(card_name: str) -> str:
+        """
+        Return the card's internal ID stored in the credit_cards collection.
+        Falls back to raising if no exact (case-insensitive) match is found.
+        """
+        card_doc = cards_collection.find_one(
+            {"card_name": {"$regex": f"^{re.escape(card_name)}$", "$options": "i"}},
+            projection={"_id": 1, "card_id": 1}        # only the fields we need
+        )
+
+        if not card_doc:
+            raise LookupError(f"Card name '{card_name}' not found in credit_cards")
+
+        # Decide which field you want to store.
+        # • If you made your own numeric/string ID field, keep it.
+        # • Otherwise just use Mongo’s own _id.
+        return str(card_doc.get("card_id") or card_doc["_id"])
+
+    card_id = get_card_id(best_card_name)
+    print("Resolved card_id →", card_id)
+
     mycol = db["recommendations2"]
     # user_suggestion = { "_id":"682c46b8f4a86be58de43b95", "suggestion": response.to_string() }
     # print(user_suggestion)
     #result = mycol.insert_one({ "_id" : user_collection["_id"], 'suggestion':user_suggestion["suggestion"]})
-    result = mycol.insert_one({ "user_id" : user_id, 'card_id':'12345', 'card_name':'Axis card test', 'suggestion':response.content})
+
+    query   = {"user_id": user_id}   # “primary key”
+    update  = {
+        "$set": {
+            "card_id": card_id,
+            "card_name":  best_card_name,
+            "suggestion": response.content
+        }
+    }
+
+    result = mycol.update_one(query, update, upsert=True)
     print(result.acknowledged)
     # query_filter = { "_id" : user_suggestion["_id"] }
     # update_operation = { "$set" : 
