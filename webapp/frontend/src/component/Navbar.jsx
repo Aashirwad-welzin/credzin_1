@@ -61,24 +61,33 @@ const Navbar = () => {
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
-    <nav className="bg-blue-600 p-1 shadow-md">
-      <div className="flex justify-between items-center text-white font-medium max-w-7xl mx-auto px-4">
-        <div className="text-xl md:text-2xl font-bold tracking-wide">
-          <button onClick={() => navigate("/home")} className="hover:text-gray-400">
+    <nav className="bg-blue-600 p-1 shadow-md w-full fixed top-0 z-50">
+      <div className="flex justify-between items-center text-white font-medium max-w-7xl mx-auto px-4 relative">
+        {/* Logo - responsive size */}
+        <div className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide">
+          <button 
+            onClick={() => navigate("/home")} 
+            className="hover:text-gray-400 transition-colors duration-200"
+          >
             CREDZIN
           </button>
         </div>
 
-        <button onClick={toggleMenu} className="md:hidden text-white focus:outline-none">
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        {/* Mobile menu button - better touch target */}
+        <button 
+          onClick={toggleMenu} 
+          className="md:hidden text-white focus:outline-none p-2 hover:bg-blue-700 rounded-lg transition-colors duration-200"
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
+        {/* Desktop Navigation */}
         {!isAuthPage && user && (
-          <ul className="hidden md:flex space-x-6 items-center">
+          <ul className="hidden md:flex items-center space-x-2 lg:space-x-4">
             <li>
               <button
                 onClick={() => navigate("/home")}
-                className="hover:text-gray-200"
+                className="px-3 py-2 hover:bg-blue-700 rounded-lg transition-colors duration-200 flex items-center"
               >
                 Home
               </button>
@@ -86,21 +95,22 @@ const Navbar = () => {
 
             <li className="relative" ref={profileRef}>
               <button
-                onClick={()=>{
-                  toggleProfile();
-                  
-                }}
-                className="bg-blue-500 hover:bg-blue-700 px-6 py-1 rounded-lg transition block shadow-sm"
+                onClick={toggleProfile}
+                className="px-3 py-2 hover:bg-blue-700 rounded-lg transition-colors duration-200 flex items-center"
               >
                 Profile
               </button>
+              
+              {/* Profile Dropdown - Responsive width */}
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg z-50">
+                <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white text-black rounded-lg shadow-lg z-50">
                   <div className="p-4 border-b">
-                    <p className="font-semibold">
+                    <p className="font-semibold truncate">
                       {user?.name?.split(" ")[0] || "User"}
                     </p>
-                    <p className="text-sm text-gray-600">{user?.email || "Email"}</p>
+                    <p className="text-sm text-gray-600 truncate">
+                      {user?.email || "Email"}
+                    </p>
                   </div>
                   <ul className="py-2">
                     <li>
@@ -109,19 +119,18 @@ const Navbar = () => {
                           navigate("/manage-cards");
                           setProfileOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
                       >
                         Manage Cards
                       </button>
                     </li>
                     <li>
                       <button
-                        onClick={() =>{
-                          navigate("/profile")
-                          toggleProfile();}
-                        }
-
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                        onClick={() => {
+                          navigate("/profile");
+                          setProfileOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
                       >
                         View Profile
                       </button>
@@ -132,7 +141,7 @@ const Navbar = () => {
                           handleLogout();
                           setProfileOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200 text-red-600"
                       >
                         Logout
                       </button>
@@ -145,53 +154,56 @@ const Navbar = () => {
         )}
       </div>
 
+      {/* Mobile Navigation - Improved styling */}
       {isOpen && !isAuthPage && user && (
-        <ul className="md:hidden flex flex-col space-y-4 mt-4 px-4">
-          <li>
-            <button
-              onClick={() => {
-                navigate("/home");
-                setIsOpen(false);
-              }}
-              className="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded-lg transition block shadow-sm w-full text-left"
-            >
-              Home
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                navigate("/manage-cards");
-                setIsOpen(false);
-              }}
-              className="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded-lg transition block shadow-sm w-full text-left"
-            >
-              Manage Cards
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                toggleProfile();
-                setIsOpen(false);
-              }}
-              className="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded-lg transition block shadow-sm w-full text-left"
-            >
-              Profile
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                handleLogout();
-                setIsOpen(false);
-              }}
-              className="bg-red-500 hover:bg-red-700 px-4 py-2 rounded-lg transition block shadow-sm w-full text-left"
-            >
-              Logout
-            </button>
-          </li>
-        </ul>
+        <div className="md:hidden fixed top-[60px] left-0 right-0 bg-blue-600 border-t border-blue-500">
+          <ul className="flex flex-col p-4 space-y-2">
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/home");
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-700 text-white transition-colors duration-200"
+              >
+                Home
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/manage-cards");
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-700 text-white transition-colors duration-200"
+              >
+                Manage Cards
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/profile");
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-700 text-white transition-colors duration-200"
+              >
+                Profile
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors duration-200"
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
       )}
     </nav>
   );
