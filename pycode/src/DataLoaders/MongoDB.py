@@ -1,19 +1,24 @@
-import pandas as pd
-import pymongo  
-from pymongo import MongoClient 
+from pymongo import MongoClient, errors
 from src.Utils.utils import logger
 
 
 def mongodb_client():
-
     logger.info("Connecting to MongoDB to fetch data...")
+
     try:
         MONGO_URI = "mongodb+srv://Welzin:yYsuyoXrWcxPKmPV@welzin.1ln7rs4.mongodb.net/credzin?retryWrites=true&w=majority&appName=Welzin"
-        db_name = "credzin"
         myclient = MongoClient(MONGO_URI)
+
+        # Ping to test connection
+        myclient.admin.command('ping')
+        logger.info("MongoDB connection successful.")
+
+        # Connect to the database
+        db_name = "credzin"        
         mydb = myclient[db_name]
-    
-        logger.info("Connected to MongoDB successfully.")
+
+        logger.info(f"Connected to MongoDB {mydb} database successfully.")
+        return True
 
         # Define collection names
         # collection_user = "users"       
@@ -27,10 +32,11 @@ def mongodb_client():
         # df_credit_cards = pd.DataFrame(list(mycol_credit_card.find()))
         # df_recommendations = pd.DataFrame(list(mycol_recommendation.find()))
        
+    except errors.ServerSelectionTimeoutError as e:
+        logger.error("MongoDB server selection timeout: %s", e)
+        print("Server selection timeout:", e)
     except Exception as e:
         logger.error("Error connecting to MongoDB: %s", e)
         print("Error connecting to MongoDB:", e)
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame() 
-       
 
-    # Return empty DataFrames on error
+    return False  # Return failure flag
