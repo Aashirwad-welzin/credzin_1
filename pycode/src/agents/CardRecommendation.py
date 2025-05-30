@@ -1,6 +1,3 @@
-
-
-
 from agno.knowledge.csv import CSVKnowledgeBase
 from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
 from agno.knowledge.combined import CombinedKnowledgeBase
@@ -128,49 +125,70 @@ for user in users_with_cards:
     # location = 'Mohali'
     # list_of_cards = ['Axis Bank Vistara Credit Card', 'Axis Bank Atlas Credit Card', 'Axis Bank Rewards Credit Card']
     #response = agent3.print_response("{name} is a {age} years old {profession} with a monthly salary of INR {income} working in {location}. He already have these credit cards {list_of_cards}. Recommend him another credit card.", stream=True, markdown=True)
-    prompt = f'''You are a seasoned credit-card product specialist for the Indian market.
+    prompt = f"""
+    You are a **senior credit-card product specialist** for the Indian market.
 
-    **CRITICAL CONSTRAINT: You MUST only recommend cards that exist in your knowledge base. Do NOT suggest any cards not present in the provided data.**
+    ========================
+    NON-NEGOTIABLE RULES
+    ========================
+    1. You **MUST** recommend **only** cards that appear in your knowledge base.
+    2. The recommended card’s name must be an **exact, character-for-character, case-sensitive match** to the entry in the knowledge base  
+    (same spelling, spaces, punctuation, capitalisation).  
+    *One wrong character = invalid.*
+    3. Recommend **exactly one** card—no lists, no alternates, no “also consider”.
+    4. **Do NOT** mention or compare any card other than the single recommendation.
+    5. If no suitable card exists after applying the above rules, output  
+    **exactly**: `No suitable card found in available options.`  
+    (No other text.)
+    6. Output **must** follow the template below verbatim; any deviation is an error.
 
-    **Customer profile**
-    • Name: {name}
-    • Age: {age} years
-    • Profession: {profession}
-    • Monthly income: ₹ {income}
+    ========================
+    CUSTOMER PROFILE
+    ========================
+    • Name: {name}  
+    • Age: {age} years  
+    • Profession: {profession}  
+    • Monthly income: ₹ {income}  
     • Location: {location}
 
-    **Existing cards:** {card_names}
+    Existing cards: {card_names}
 
-    **Task**
-    1. FIRST, search your knowledge base to identify ALL available credit cards.
-    2. EXCLUDE any cards the customer already owns from your consideration.
-    3. Analyse the customer's profile, spending potential and current card portfolio.
-    4. Identify gaps in rewards, benefits or categories not covered by the existing cards (e.g., travel, dining, fuel, subscriptions).
-    5. From the REMAINING cards in your knowledge base ONLY, recommend ONE suitable credit card that best complements the current set.
-    6. Justify your choice in ≤ 120 words, covering:
-    • Key benefits that fill the identified gaps
-    • Annual/joining fee and effective waiver options
-    • Why it outperforms alternatives for this customer
+    ========================
+    TASK
+    ========================
+    1. Retrieve the full list of cards from the knowledge base.  
+    2. Exclude every card already owned by the customer.  
+    3. Analyse the customer’s profile to identify unmet needs (e.g., travel, dining, fuel, subscriptions).  
+    4. From the **remaining** cards, choose one that best fills those gaps.  
+    5. Confirm the chosen card name matches the knowledge-base entry **exactly** before output.  
+    6. Provide a concise justification (≤ 120 words) covering:  
+    • The specific benefits that plug the identified gaps  
+    • Annual/joining fee and waiver conditions  
+    • Why this card is superior for this customer
 
-    **MANDATORY RULES**
-    1. Output **exactly one** card name—no lists, alternates, or "also consider" suggestions.
-    2. The recommended card MUST exist in your knowledge base - verify this before responding.
-    3. Do NOT recommend cards the customer already owns.
-    4. Do NOT mention or compare any card other than your single recommendation.
-    5. If no suitable card exists in your knowledge base, respond with "No suitable card found in available options."
-    6. Follow the output template verbatim.
-
-    **Output template** (Markdown)
-    **Best Card:** *<Card Name>*
+    ========================
+    OUTPUT TEMPLATE (Markdown) — USE EXACTLY
+    ========================
+    **Best Card:** *<Exact Card Name>*  
     **Why it suits {name}:** <justification>
 
-    **Suggest only 1 card from your knowledge base and no extra text**
-    '''
+    (Return only the two lines above — nothing else.)
+    """
+
+
     # response = agent3.print_response(
     #                                 prompt,
     #                                 stream=True,
     #                                 markdown=True,
     #                                 )
+
+
+    ollama_model = Ollama(
+        id="llama3.2",
+        # every key here is forwarded to the Ollama server
+        options={"temperature": 0.0, "top_p": 0.95}
+    )
+    
     agent3 = Agent(
         description="You are a credit card expert and analyser",
         #instructions=["Give customer suggestions based on the credit card features using the knowledge base. Only show 1 card as suggestion and no extra text"],
@@ -178,7 +196,7 @@ for user in users_with_cards:
         #knowledge=combined_knowledge_base,
         knowledge=csv_knowledge_base,
         search_knowledge=True,
-        model=Ollama(id="llama3.2"),
+        model=ollama_model,
         #reasoning_model=Ollama(id="deepseek-r1:1.5b"),
         #tools=[ThinkingTools(add_instructions=True)],
         tools=[ReasoningTools(add_instructions=True)],
@@ -211,7 +229,7 @@ for user in users_with_cards:
 
         return m.group(1).strip() 
     
-
+    
     best_card_name = extract_best_card(response.content)
     print("Extracted →", best_card_name)
 
@@ -236,7 +254,7 @@ for user in users_with_cards:
     card_id = get_card_id(best_card_name)
     print("Resolved card_id →", card_id)
 
-    mycol = db["recommendations2"]
+    mycol = db["recommendations3"]
     # user_suggestion = { "_id":"682c46b8f4a86be58de43b95", "suggestion": response.to_string() }
     # print(user_suggestion)
     #result = mycol.insert_one({ "_id" : user_collection["_id"], 'suggestion':user_suggestion["suggestion"]})
