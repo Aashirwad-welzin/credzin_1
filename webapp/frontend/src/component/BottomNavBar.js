@@ -13,7 +13,7 @@ const BottomNavBar = () => {
   const navItems = [
     { label: 'Home', icon: <FaHome />, path: '/home' },
     { label: 'Cards', icon: <FaCreditCard />, path: '/manage-cards' },
-    { label: 'Transactions', icon: <FaExchangeAlt />, path: '/transactions' },
+    { label: 'Transactions', icon: <FaExchangeAlt />, path: '/home' },
     { label: 'Account', icon: <FaUserCircle />, path: '/profile' },
     { label: 'Settings', icon: <FaCog />, path: '/settings' }
   ];

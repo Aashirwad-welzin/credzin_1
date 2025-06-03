@@ -162,6 +162,7 @@ import { addToCart } from "../app/slices/cartSlice";  // Adjust the import path 
 import BottomNavBar from "../component/BottomNavBar";
 
 
+
 // const cards = [
 //   {
 //     title: "Platinum Card",
@@ -174,19 +175,34 @@ import BottomNavBar from "../component/BottomNavBar";
 //     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB2fMTiprw_U7SiNhwU_czwS8RwvfXFD2ZGnyLC8FcDYsOdb5o3sxPOsMEpGHYODkMtgAXgRhZ2LAFDLs_fs-moiRF_113MzPRUQgA3KKwW6Rj0fC6tY4c6P13ogDxRIBqEa2S_lIA5lkBlDL5TE3pPtuh7GUEwmh6zK1BcO8jeOcemcGlX84gE1xV_E_VvjU97hc0P1jOkuQzRKyh3p2XND9v4rk395KIpTbwnwf3EkboMEPayzTTOvkwwqCoLoGL91HTMpb6xEw"
 //   }
 // ];
+// const token = localStorage.getItem("token");  
+// useEffect(()=>{
+//   const fetchRecommendation=async()=>{
+//     try{
+//       const response  = await axios.get(`${apiEndpoint}/api/v1/auth/login`,
+//         {
+//           headers: { Authorization: `Bearer ${token}` }
+//         }
+//       )
+//       console.log("this is response  from the recommendatio",response)
+//     }catch(error){
 
-const recommended = [
-  {
-    title: "Travel Rewards Card",
-    desc: "Earn points on every purchase",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_v4zL_HRiYkMTyDTKATG6rNhcqshxEieRXmNlCPgkChqHQh9r46tOVuK0HC9_Ms3pv14aK4-AcrN7uQsTDNGy-qOrUxs3HVh6eifiWV-LsNxABcTmG_yv4H_AsS-mWceNMjPCvIqUpZRssQ0QXYeu42RRZsxasIKIJP--C1nky9QLLkmpjSRVzkrUQIyISK64kqXGogVjUkSSB97j2dhrK0MATv6fZ0j3_ulX1FqSDCaBOQrKFAvhsIouKDaYKnZqrmS20q0vzg"
-  },
-  {
-    title: "Cash Back Card",
-    desc: "Get cash back on everyday spending",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAloUYDZlRh3fhnbyd1xl_Uc4T000V_dfaAWckk6h02wGd-iPxdVKV0jIaPAorPHV1i9KDJCiBxIRE70QeduXG_mr2r5maced5Ek1L8jCSAyNTJybcx2IXexXI4dVt4xq7L9hNSTCc12g9Nyc_ZRBKoZrh4omgRZvW9N2qRraG-mHgRK5uaeVbVNFw0wIVwoj6QMynn5Bp6fv2_o8GcTGbnqpCmZmSCpKbo7MdIOC_VMnVb_navI05lSoR0IV2n0mOGnQZEZdUg2g"
-  }
-];
+//     }
+//   }
+// },[])
+
+// const recommended = [
+//   {
+//     title: "Travel Rewards Card",
+//     desc: "Earn points on every purchase",
+//     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_v4zL_HRiYkMTyDTKATG6rNhcqshxEieRXmNlCPgkChqHQh9r46tOVuK0HC9_Ms3pv14aK4-AcrN7uQsTDNGy-qOrUxs3HVh6eifiWV-LsNxABcTmG_yv4H_AsS-mWceNMjPCvIqUpZRssQ0QXYeu42RRZsxasIKIJP--C1nky9QLLkmpjSRVzkrUQIyISK64kqXGogVjUkSSB97j2dhrK0MATv6fZ0j3_ulX1FqSDCaBOQrKFAvhsIouKDaYKnZqrmS20q0vzg"
+//   },
+//   {
+//     title: "Cash Back Card",
+//     desc: "Get cash back on everyday spending",
+//     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAloUYDZlRh3fhnbyd1xl_Uc4T000V_dfaAWckk6h02wGd-iPxdVKV0jIaPAorPHV1i9KDJCiBxIRE70QeduXG_mr2r5maced5Ek1L8jCSAyNTJybcx2IXexXI4dVt4xq7L9hNSTCc12g9Nyc_ZRBKoZrh4omgRZvW9N2qRraG-mHgRK5uaeVbVNFw0wIVwoj6QMynn5Bp6fv2_o8GcTGbnqpCmZmSCpKbo7MdIOC_VMnVb_navI05lSoR0IV2n0mOGnQZEZdUg2g"
+//   }
+// ];
 
 const benefits = [
   {
@@ -215,7 +231,25 @@ const Home = () => {
 const dispatch = useDispatch();
 const navigate = useNavigate();
 const cards = useSelector((state) => state.cart.cart);
+const[recommended,setRecommendation]=useState({})
 console.log("Cards in Home:", cards);
+const token = localStorage.getItem("token");  
+useEffect(()=>{
+  const fetchRecommendation=async()=>{
+    try{
+      const recommended  = await axios.get(`${apiEndpoint}/api/v1/card/recommendedcard`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      console.log("this is response  from the recommendatio",recommended)
+      setRecommendation(recommended.data.cards)
+    }catch(error){
+
+    }
+  }
+  fetchRecommendation();
+},[token])
   
 return (
   <div className="relative min-h-screen flex flex-col bg-[#111518] font-sans text-white">
@@ -250,18 +284,24 @@ return (
     {/* Recommended Cards */}
     <h2 className="text-[22px] font-bold px-4 pb-3 pt-5">Recommended Cards</h2>
     <div className="flex overflow-x-auto px-4 gap-3">
-      {recommended.map((card, i) => (
-        <div key={i} className="flex flex-col gap-4 rounded-lg min-w-60 bg-[#1b2127]">
-          <div
-            className="w-full aspect-video bg-center bg-no-repeat bg-cover rounded-xl"
-            style={{ backgroundImage: `url('${card.img}')` }}
-          ></div>
-          <div>
-            <p className="text-base font-medium">{card.title}</p>
-            <p className="text-[#9cabba] text-sm">{card.desc}</p>
+      {recommended && (
+          <div className="flex flex-col gap-4 rounded-lg min-w-60 bg-[#1b2127]">
+            <div
+              className="w-full aspect-video bg-center bg-no-repeat bg-cover rounded-xl"
+              // style={{ backgroundImage: `url('${recommended.img}')` }}
+            >
+               <img
+                src={recommended.image_url || "https://via.placeholder.com/150"}
+                alt={recommended.card_name}
+                className="w-full h-full object-contain"
+            />
+            </div>
+            <div>
+              <p className="text-base font-medium">{recommended.card_name}</p>
+              {/* <p className="text-[#9cabba] text-sm">{recommended.desc}</p> */}
+            </div>
           </div>
-        </div>
-      ))}
+        )}
     </div>
     {/* Benefits */}
     <h2 className="text-[22px] font-bold px-4 pb-3 pt-5">Benefits</h2>

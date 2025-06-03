@@ -1,5 +1,7 @@
 const Card = require("../../models/card")
 const Recommendation = require("../../models/recommendations")
+const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 // const User = require("../../models/User")
 exports.Cardfetch=async(req,res)=>{
     try{
@@ -58,7 +60,7 @@ exports.recommended_card = async (req, res) => {
                 message: `User ID not found`,
             });
         }
-        const recomended_card = await Recommendation.find({ _id:userId });
+        const recomended_card = await Recommendation.find({ user_id:userId });
         console.log("recomended card is", recomended_card);
         if (!recomended_card) {
             return res.status(400).json({
@@ -66,11 +68,15 @@ exports.recommended_card = async (req, res) => {
                 message: `No recommended cards found for user ${userId}`,
             });
         }
+        const card_id = recomended_card[0].card_id
+        const cardId = new mongoose.Types.ObjectId(card_id);
+        
+        const card_details = await Card.findById({_id:cardId})
 
         res.status(200).json({
             success: true,
             message: `All cards for ${userId}`,
-            cards: recomended_card,
+            cards: card_details,
         });
     } catch (error) {
         return res.status(500).json({
