@@ -132,38 +132,38 @@ const getUserFullDetails = async () => {
   }
 };
 
-const getRecommendedCard = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    console.warn('No token found');
-    return;
-  }
-  try {
-    const response = await axios.get(`${apiEndpoint}/api/v1/card/recommendedcard`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log('Recommended cards:', response.data);
+// const getRecommendedCard = async () => {
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     console.warn('No token found');
+//     return;
+//   }
+//   try {
+//     const response = await axios.get(`${apiEndpoint}/api/v1/card/recommendedcard`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     console.log('Recommended cards:', response.data);
 
-    if (response.status === 200) {
-      console.log('Recommended cards:', response.data.cards);
-      const recommendedCards = response.data.cards;
-      dispatch(setRecommendedList(recommendedCards));
+//     if (response.status === 200) {
+//       console.log('Recommended cards:', response.data.cards);
+//       const recommendedCards = response.data.cards;
+//       dispatch(setRecommendedList(recommendedCards));
 
-      // dispatch(setCart(recommendedCards));
-    }
-  } catch (error) {
-    console.error('Error fetching recommended cards:', error.response?.data || error.message);
-  }
-}
+//       // dispatch(setCart(recommendedCards));
+//     }
+//   } catch (error) {
+//     console.error('Error fetching recommended cards:', error.response?.data || error.message);
+//   }
+// }
   // Step 4: Run once on mount
   useEffect(() => {
     getUserFullDetails();
     getUser();
     getCardDetails();
     get_all_bank();
-    getRecommendedCard()
+    
   }, []);
 
   return (

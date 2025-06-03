@@ -19,4 +19,4 @@ const recommendationSchema = new mongoose.Schema({
     required: true,
   },
 },);
-module.exports = mongoose.model('Recommendation', recommendationSchema);
+module.exports = mongoose.model('Recommendations3', recommendationSchema);
