@@ -17,6 +17,7 @@ import { setBankList } from './app/slices/bankSlice';
 import AdditionalDetails from './pages/AdditionalDetails';
 import  Profile  from './pages/Profile';
 import { setRecommendedList } from './app/slices/recommendedSlice';
+import BottomNavBar from './component/BottomNavBar';
 
 function App() {
   const dispatch = useDispatch();
@@ -184,6 +185,7 @@ const getRecommendedCard = async () => {
         <Route path="/additional-details" element={<AdditionalDetails/>}/>
         <Route path="/profile" element={<Profile/>}/>
       </Routes>
+      
       <Footer />
     </div>
   );
