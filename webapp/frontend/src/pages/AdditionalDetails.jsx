@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { apiEndpoint } from '../api';  
 import { useNavigate } from 'react-router-dom';
+import BottomNavBar from '../component/BottomNavBar';
 const AdditionalDetails = () => {
   const [ageRange, setAgeRange] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
@@ -158,7 +159,7 @@ const AdditionalDetails = () => {
           </div>
         </div>
       </div>
-
+      <BottomNavBar/>
       {/* Footer */}
     </div>
   );

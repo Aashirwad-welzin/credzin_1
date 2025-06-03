@@ -203,6 +203,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "../app/slices/cartSlice";
 import { apiEndpoint } from "../api";
 import { setBankList } from "../app/slices/bankSlice";
+import BottomNavBar from "../component/BottomNavBar";
 
 const ManageCards = () => {
   const navigate = useNavigate();
@@ -455,6 +456,7 @@ const ManageCards = () => {
           </div>
         </div>
       )}
+      <BottomNavBar/>
     </div>
   );
 };
