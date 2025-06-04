@@ -306,19 +306,19 @@ const Signup = () => {
       style={{ fontFamily: 'Manrope, Noto Sans, sans-serif' }}
     >
       <div>
-        <div className="flex items-center bg-[#1a1a1a] p-4 pb-2 justify-between">
+        <div className="flex items-center bg-[#1a1a1a] p-14 pb-2 justify-between">
           <div className="text-white flex size-12 shrink-0 items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            {/* <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
-            </svg>
+            </svg> */}
           </div>
           <h2 className="text-white text-lg font-bold text-center flex-1 pr-12">Sign up</h2>
         </div>
 
-        <h1 className="text-white text-[22px] font-bold px-4 pt-5 pb-3">Create your account</h1>
+        {/* <h1 className="text-white text-[22px] font-bold px-4 pt-5 pb-3">Create your account</h1> */}
 
         <form onSubmit={handleSubmit}>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="text"
               name="firstName"
@@ -329,7 +329,7 @@ const Signup = () => {
               required
             />
           </div>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="text"
               name="lastName"
@@ -340,7 +340,7 @@ const Signup = () => {
               required
             />
           </div>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="email"
               name="email"
@@ -351,7 +351,7 @@ const Signup = () => {
               required
             />
           </div>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="password"
               name="password"
@@ -362,7 +362,7 @@ const Signup = () => {
               required
             />
           </div>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="password"
               name="confirmPassword"
@@ -373,7 +373,7 @@ const Signup = () => {
               required
             />
           </div>
-          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3">
+          <div className="flex max-w-[480px] flex-wrap gap-4 px-4 py-3 mx-auto">
             <input
               type="text"
               name="contact"
@@ -387,7 +387,7 @@ const Signup = () => {
 
           {error && <p className="text-red-500 text-sm text-center px-4">{error}</p>}
 
-          <div className="flex px-4 py-3">
+          <div className="flex px-4 py-3 mx-auto max-w-[240px]">
             <button
               type="submit"
               className="w-full h-12 bg-[#363636] rounded-full text-white font-bold tracking-[0.015em]"
