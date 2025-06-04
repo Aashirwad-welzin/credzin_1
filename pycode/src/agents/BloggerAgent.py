@@ -5,10 +5,61 @@ from agno.models.ollama import Ollama
 from agno.team.team import Team
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.newspaper4k import Newspaper4kTools
+from agno.knowledge.csv import CSVKnowledgeBase
+from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
+from agno.knowledge.combined import CombinedKnowledgeBase
+from agno.vectordb.chroma import ChromaDb
+from agno.agent import Agent
+from agno.models.ollama import Ollama
+from agno.embedder.sentence_transformer import SentenceTransformerEmbedder
+import pymongo
+from agno.tools.thinking import ThinkingTools
+from agno.tools.reasoning import ReasoningTools
+import re
+from agno.run.response import RunResponse
+
+#Initialize the local embedder
+embedder = SentenceTransformerEmbedder(id="all-MiniLM-L6-v2")
+# Initialize ChromaDB with the local embedder
+vector_db = ChromaDb(
+    collection="pdf_docs",
+    path="tmp/chromadb",
+    persistent_client=True,
+    embedder=embedder
+)
+# Create knowledge base
+pdf_knowledge_base = PDFKnowledgeBase(
+    path="/Users/aman/Welzin/dev/credzin/KnowledgeBase/banks/AxisBank/",
+    vector_db=vector_db,
+    reader=PDFReader(),
+)
+
+vector_db2 = ChromaDb(
+    collection="csv_docs",
+    path="tmp/chromadb",
+    persistent_client=True,
+    embedder=embedder
+)
+csv_knowledge_base = CSVKnowledgeBase(
+    path="/Users/aman/Welzin/dev/credzin/KnowledgeBase/banks/AxisBank/",
+    vector_db=vector_db2
+)
+
+combined_knowledge_base = CombinedKnowledgeBase(
+    sources=[
+        pdf_knowledge_base,
+        csv_knowledge_base
+    ],
+    vector_db=ChromaDb(
+        collection="combined_docs",
+        path="tmp/chromadb",
+        persistent_client=True,
+        embedder=embedder
+    ),
+)
 
 #urls_file = Path(__file__).parent.joinpath("tmp", "urls__{session_id}.md")
 #urls_file.parent.mkdir(parents=True, exist_ok=True)
-
 
 searcher = Agent(
     name="Searcher",
@@ -19,6 +70,9 @@ searcher = Agent(
         "For each search term, search the web and analyze the results.Return the 10 most relevant URLs to the topic.",
         "You are writing for the Fintech firm Credzin, so the quality of the sources is important.",
     ],
+    #knowledge=combined_knowledge_base,
+    knowledge=combined_knowledge_base,
+    search_knowledge=True,
     tools=[DuckDuckGoTools()],
     add_datetime_to_instructions=True,
 )
@@ -40,6 +94,9 @@ writer = Agent(
         "Never make up facts or plagiarize. Always provide proper attribution.",
         "Remember: you are writing for the fintech firm, so the quality of the article is important.",
     ],
+    #knowledge=combined_knowledge_base,
+    knowledge=combined_knowledge_base,
+    search_knowledge=True,
     tools=[Newspaper4kTools()],
     add_datetime_to_instructions=True,
 )
