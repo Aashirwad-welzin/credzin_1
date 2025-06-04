@@ -170,7 +170,7 @@ function Login() {
         { withCredentials: true }
       );
       if (response.status !== 200) throw new Error("Login failed");
-      toast.success("Login successful!");
+      toast.success("Login successful!", { autoClose: 1000 });
       localStorage.setItem("token", response.data.token);
       if (response.data.user.isfirstLogin === true) {
         navigate("/additional-details");
