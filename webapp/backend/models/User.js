@@ -58,7 +58,20 @@ const userSchema = new mongoose.Schema({
   isfirstLogin: {
     type: Boolean,
     default: true,
-  },  
+  },
+  poolCreated:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'pool'
+
+
+  },
+  poolJoined:[
+    {
+      type: mongoose.Schema.ObjectId,
+      ref:'pool'
+    }
+
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
